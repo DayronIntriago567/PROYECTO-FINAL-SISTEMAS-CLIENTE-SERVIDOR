@@ -1,14 +1,17 @@
-﻿namespace BikeStore.API.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BikeStore.API.Models
 {
     public class Bicicleta
     {
+        [Key]
         public int IdBicicleta { get; set; }
         public int IdCategoria { get; set; }
-        public string Marca { get; set; }
-        public string Modelo { get; set; }
+        public string Marca { get; set; } = string.Empty;
+        public string Modelo { get; set; } = string.Empty;
         public decimal Precio { get; set; }
         public int Stock { get; set; }
-        public string Estado { get; set; }
+        public string Estado { get; set; } = "Disponible";
 
         public Categoria? Categoria { get; set; }
     }

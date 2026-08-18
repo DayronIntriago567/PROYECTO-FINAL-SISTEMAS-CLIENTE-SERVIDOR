@@ -1,23 +1,29 @@
-using Microsoft.EntityFrameworkCore;
 using BikeStore.API.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Controladores
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
+// Entity Framework Core
 builder.Services.AddDbContext<BikeStoreContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BikeStoreConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("BikeStoreConnection")
+    ));
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Swagger
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
