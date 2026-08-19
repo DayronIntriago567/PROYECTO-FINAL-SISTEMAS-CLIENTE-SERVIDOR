@@ -1,3 +1,10 @@
 <Solution>
+  <Folder Name="/Diagramas/">
+    <File Path="../Diagramas/diagramas_bikestore-Arquitectura.drawio.png" />
+    <File Path="../Diagramas/diagramas_bikestore-Diagrama de clases.drawio.png" />
+    <File Path="../Diagramas/diagramas_bikestore-Secuencia - Registrar bicicleta.drawio.png" />
+    <File Path="../Diagramas/diagramas_bikestore-Secuencia - Registrar venta.drawio.png" />
+  </Folder>
+  <Folder Name="/Elementos de la solución/" />
   <Project Path="BikeStore.API.csproj" />
 </Solution>
