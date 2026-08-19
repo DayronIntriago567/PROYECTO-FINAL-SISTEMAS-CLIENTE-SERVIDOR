@@ -60,6 +60,41 @@ namespace BikeStore.API.Controllers
             return Ok(bicicletas);
         }
 
+        [HttpGet("marca/{marca}")]
+        public async Task<ActionResult<IEnumerable<Bicicleta>>> GetBicicletasPorMarca(string marca)
+        {
+            var bicicletas = await _context.Bicicletas
+                .Include(b => b.Categoria)
+                .Where(b => b.Marca.Contains(marca))
+                .ToListAsync();
+
+            return Ok(bicicletas);
+        }
+
+        [HttpGet("stock-bajo")]
+        public async Task<ActionResult<IEnumerable<Bicicleta>>> GetBicicletasStockBajo()
+        {
+            const int UMBRAL_STOCK_BAJO = 5;
+
+            var bicicletas = await _context.Bicicletas
+                .Include(b => b.Categoria)
+                .Where(b => b.Stock > 0 && b.Stock <= UMBRAL_STOCK_BAJO)
+                .ToListAsync();
+
+            return Ok(bicicletas);
+        }
+
+        [HttpGet("agotadas")]
+        public async Task<ActionResult<IEnumerable<Bicicleta>>> GetBicicletasAgotadas()
+        {
+            var bicicletas = await _context.Bicicletas
+                .Include(b => b.Categoria)
+                .Where(b => b.Stock == 0)
+                .ToListAsync();
+
+            return Ok(bicicletas);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Bicicleta>> PostBicicleta(Bicicleta bicicleta)
         {
