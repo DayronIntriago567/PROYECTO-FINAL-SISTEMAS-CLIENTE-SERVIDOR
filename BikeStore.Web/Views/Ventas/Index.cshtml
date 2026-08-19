@@ -1,0 +1,39 @@
+@model List<BikeStore.Web.Models.Venta>
+
+@{
+    ViewData["Title"] = "Ventas";
+}
+
+<h1>Ventas</h1>
+
+@foreach (var v in Model)
+{
+    <div style="border:1px solid #ccc; margin-bottom:15px; padding:10px;">
+        <p><strong>Venta #@v.IdVenta</strong> - @v.Fecha.ToString("dd/MM/yyyy")</p>
+        <p>Cliente: @v.Cliente?.Nombres @v.Cliente?.Apellidos</p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Bicicleta</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in v.Detalles)
+                {
+                    <tr>
+                        <td>@d.Bicicleta?.Marca @d.Bicicleta?.Modelo</td>
+                        <td>@d.Cantidad</td>
+                        <td>@d.Precio</td>
+                        <td>@d.Subtotal</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <p>Subtotal: @v.Subtotal | IVA: @v.Iva | <strong>Total: @v.Total</strong></p>
+    </div>
+}

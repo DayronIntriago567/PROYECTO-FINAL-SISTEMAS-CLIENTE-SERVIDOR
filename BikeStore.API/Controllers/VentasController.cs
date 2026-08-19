@@ -10,7 +10,6 @@ namespace BikeStore.API.Controllers
     [Route("api/ventas")]
     public class VentasController : ControllerBase
     {
-        // Ajusta este valor si tu docente pide otro porcentaje de IVA.
         private const decimal PORCENTAJE_IVA = 0.15m; // 15%
 
         private readonly BikeStoreContext _context;
@@ -20,7 +19,6 @@ namespace BikeStore.API.Controllers
             _context = context;
         }
 
-        // GET api/ventas  -> historial completo
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VentaResponseDTO>>> GetVentas()
         {
@@ -34,7 +32,6 @@ namespace BikeStore.API.Controllers
             return Ok(ventas.Select(ToDto));
         }
 
-        // GET api/ventas/5
         [HttpGet("{id}")]
         public async Task<ActionResult<VentaResponseDTO>> GetVenta(int id)
         {
@@ -50,7 +47,6 @@ namespace BikeStore.API.Controllers
             return Ok(ToDto(venta));
         }
 
-        // GET api/ventas/cliente/3  -> ventas de un cliente especifico
         [HttpGet("cliente/{idCliente}")]
         public async Task<ActionResult<IEnumerable<VentaResponseDTO>>> GetVentasPorCliente(int idCliente)
         {
@@ -69,11 +65,9 @@ namespace BikeStore.API.Controllers
             return Ok(ventas.Select(ToDto));
         }
 
-        // POST api/ventas -> registrar una venta con uno o varios productos
         [HttpPost]
         public async Task<ActionResult<VentaResponseDTO>> CrearVenta(CrearVentaDTO dto)
         {
-            // 1. Validar que el cliente exista
             var cliente = await _context.Clientes.FindAsync(dto.IdCliente);
             if (cliente == null)
                 return NotFound(new { mensaje = $"No existe un cliente con id {dto.IdCliente}" });
@@ -81,12 +75,10 @@ namespace BikeStore.API.Controllers
             if (dto.Detalles == null || dto.Detalles.Count == 0)
                 return BadRequest(new { mensaje = "La venta debe incluir al menos un producto" });
 
-            // Evitar que manden la misma bicicleta repetida en dos líneas distintas
             var idsRepetidos = dto.Detalles.GroupBy(d => d.IdBicicleta).Any(g => g.Count() > 1);
             if (idsRepetidos)
-                return BadRequest(new { mensaje = "No repitas la misma bicicleta en varias líneas, suma la cantidad en una sola" });
+                return BadRequest(new { mensaje = "No repitas la misma bicicleta en varias lineas, suma la cantidad en una sola" });
 
-            // Usamos una transacción: si algo falla, no se descuenta stock a medias
             await using var transaccion = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -105,7 +97,6 @@ namespace BikeStore.API.Controllers
                     if (bicicleta == null)
                         return NotFound(new { mensaje = $"No existe la bicicleta con id {linea.IdBicicleta}" });
 
-                    // 2. Validar stock suficiente
                     if (bicicleta.Stock < linea.Cantidad)
                         return BadRequest(new
                         {
@@ -120,15 +111,12 @@ namespace BikeStore.API.Controllers
                     {
                         IdBicicleta = bicicleta.IdBicicleta,
                         Cantidad = linea.Cantidad,
-                        Precio = bicicleta.Precio,
-                        Subtotal = subtotalLinea
+                        Precio = bicicleta.Precio
                     });
 
-                    // 3. Actualizar stock automáticamente
                     bicicleta.Stock -= linea.Cantidad;
                 }
 
-                // 4. Calcular subtotal, IVA y total
                 venta.Subtotal = subtotalVenta;
                 venta.Iva = Math.Round(subtotalVenta * PORCENTAJE_IVA, 2);
                 venta.Total = venta.Subtotal + venta.Iva;
@@ -137,7 +125,6 @@ namespace BikeStore.API.Controllers
                 await _context.SaveChangesAsync();
                 await transaccion.CommitAsync();
 
-                // recargar con navegación para armar la respuesta
                 var ventaCompleta = await _context.Ventas
                     .Include(v => v.Cliente)
                     .Include(v => v.Detalles!)
@@ -146,10 +133,10 @@ namespace BikeStore.API.Controllers
 
                 return CreatedAtAction(nameof(GetVenta), new { id = venta.IdVenta }, ToDto(ventaCompleta));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await transaccion.RollbackAsync();
-                return StatusCode(500, new { mensaje = "Ocurrió un error registrando la venta, no se aplicaron cambios" });
+                return StatusCode(500, new { mensaje = ex.Message, detalle = ex.InnerException?.Message });
             }
         }
 

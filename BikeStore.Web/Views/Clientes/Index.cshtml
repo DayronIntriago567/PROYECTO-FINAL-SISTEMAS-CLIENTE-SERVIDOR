@@ -1,0 +1,31 @@
+@model List<BikeStore.Web.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<h1>Clientes</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Cedula</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Telefono</th>
+            <th>Correo</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Cedula</td>
+                <td>@c.Nombres</td>
+                <td>@c.Apellidos</td>
+                <td>@c.Telefono</td>
+                <td>@c.Correo</td>
+            </tr>
+        }
+    </tbody>
+</table>
