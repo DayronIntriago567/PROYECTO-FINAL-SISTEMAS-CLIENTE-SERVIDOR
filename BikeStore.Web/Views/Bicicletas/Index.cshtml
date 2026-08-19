@@ -2,9 +2,47 @@
 
 @{
     ViewData["Title"] = "Bicicletas";
+    var categorias = ViewBag.Categorias as List<BikeStore.Web.Models.Categoria> ?? new();
 }
 
 <h1>Bicicletas</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-auto">
+        <label class="form-label">Categoria</label>
+        <select name="idCategoria" class="form-select">
+            <option value="">-- Todas --</option>
+            @foreach (var c in categorias)
+            {
+                <option value="@c.IdCategoria" selected="@(ViewBag.FiltroCategoria == c.IdCategoria)">@c.Nombre</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Marca</label>
+        <input type="text" name="marca" class="form-control" value="@ViewBag.FiltroMarca" placeholder="Ej: Trek" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-secondary">Buscar</button>
+    </div>
+    <div class="col-auto">
+        <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+</form>
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">Nueva bicicleta</a>
+    <a asp-action="StockBajo" class="btn btn-warning">Ver stock bajo</a>
+</div>
 
 <table class="table">
     <thead>
@@ -15,6 +53,7 @@
             <th>Precio</th>
             <th>Stock</th>
             <th>Estado</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -27,6 +66,10 @@
                 <td>@b.Precio</td>
                 <td>@b.Stock</td>
                 <td>@b.Estado</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@b.IdBicicleta" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@b.IdBicicleta" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
             </tr>
         }
     </tbody>

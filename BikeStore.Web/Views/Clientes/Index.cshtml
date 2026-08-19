@@ -6,6 +6,15 @@
 
 <h1>Clientes</h1>
 
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">Nuevo cliente</a>
+</div>
+
 <table class="table">
     <thead>
         <tr>

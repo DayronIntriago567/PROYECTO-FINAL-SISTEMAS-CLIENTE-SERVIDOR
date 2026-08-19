@@ -6,5 +6,6 @@
     <File Path="../Diagramas/diagramas_bikestore-Secuencia - Registrar venta.drawio.png" />
   </Folder>
   <Folder Name="/Elementos de la solución/" />
+  <Project Path="../BikeStore.Web/BikeStore.Web.csproj" />
   <Project Path="BikeStore.API.csproj" />
 </Solution>

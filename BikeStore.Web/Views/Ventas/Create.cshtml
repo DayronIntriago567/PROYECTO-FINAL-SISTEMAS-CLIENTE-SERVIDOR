@@ -1,0 +1,92 @@
+@model BikeStore.Web.Models.CrearVentaViewModel
+
+@{
+    ViewData["Title"] = "Registrar venta";
+    var clientes = ViewBag.Clientes as List<BikeStore.Web.Models.Cliente> ?? new();
+    var bicicletas = ViewBag.Bicicletas as List<BikeStore.Web.Models.Bicicleta> ?? new();
+}
+
+<h1>Registrar venta</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label class="form-label">Cliente</label>
+        <select asp-for="IdCliente" class="form-select">
+            <option value="">-- Seleccione --</option>
+            @foreach (var c in clientes)
+            {
+                <option value="@c.IdCliente">@c.Nombres @c.Apellidos - @c.Cedula</option>
+            }
+        </select>
+    </div>
+
+    <h5>Productos</h5>
+    <table class="table" id="tabla-detalle">
+        <thead>
+            <tr>
+                <th>Bicicleta</th>
+                <th>Cantidad</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select name="Detalles[0].IdBicicleta" class="form-select">
+                        <option value="">-- Seleccione --</option>
+                        @foreach (var b in bicicletas)
+                        {
+                            <option value="@b.IdBicicleta">@b.Marca @b.Modelo (stock: @b.Stock)</option>
+                        }
+                    </select>
+                </td>
+                <td><input type="number" name="Detalles[0].Cantidad" class="form-control" min="1" /></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="button" id="btn-agregar-linea" class="btn btn-outline-secondary mb-3">+ Agregar otra bicicleta</button>
+    <br />
+    <button type="submit" class="btn btn-primary">Registrar venta</button>
+    <a asp-action="Index" class="btn btn-link">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script>
+        // Genera dinamicamente filas nuevas con indices secuenciales Detalles[N]
+        // para que el model binding de ASP.NET Core arme la lista correctamente.
+        (function () {
+            var contador = 1;
+            var opcionesBicicletas = @Html.Raw(Json.Serialize(bicicletas.Select(b => new { id = b.IdBicicleta, texto = $"{b.Marca} {b.Modelo} (stock: {b.Stock})" })));
+
+            document.getElementById('btn-agregar-linea').addEventListener('click', function () {
+                var tbody = document.querySelector('#tabla-detalle tbody');
+                var fila = document.createElement('tr');
+
+                var selectHtml = '<select name="Detalles[' + contador + '].IdBicicleta" class="form-select"><option value="">-- Seleccione --</option>';
+                opcionesBicicletas.forEach(function (b) {
+                    selectHtml += '<option value="' + b.id + '">' + b.texto + '</option>';
+                });
+                selectHtml += '</select>';
+
+                fila.innerHTML =
+                    '<td>' + selectHtml + '</td>' +
+                    '<td><input type="number" name="Detalles[' + contador + '].Cantidad" class="form-control" min="1" /></td>' +
+                    '<td><button type="button" class="btn btn-outline-danger btn-quitar">Quitar</button></td>';
+
+                tbody.appendChild(fila);
+
+                fila.querySelector('.btn-quitar').addEventListener('click', function () {
+                    // Solo vacia los valores en vez de eliminar la fila, asi no se rompen los indices siguientes
+                    fila.querySelectorAll('select, input').forEach(function (campo) { campo.value = ''; });
+                    fila.style.display = 'none';
+                });
+
+                contador++;
+            });
+        })();
+    </script>
+}

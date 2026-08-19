@@ -1,0 +1,23 @@
+@model BikeStore.Web.Models.Bicicleta
+
+@{
+    ViewData["Title"] = "Eliminar bicicleta";
+}
+
+<h1>¿Eliminar esta bicicleta?</h1>
+
+<dl class="row">
+    <dt class="col-sm-2">Marca</dt>
+    <dd class="col-sm-10">@Model.Marca</dd>
+    <dt class="col-sm-2">Modelo</dt>
+    <dd class="col-sm-10">@Model.Modelo</dd>
+    <dt class="col-sm-2">Precio</dt>
+    <dd class="col-sm-10">@Model.Precio</dd>
+    <dt class="col-sm-2">Stock</dt>
+    <dd class="col-sm-10">@Model.Stock</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.IdBicicleta" method="post">
+    <button type="submit" class="btn btn-danger">Confirmar eliminación</button>
+    <a asp-action="Index" class="btn btn-link">Cancelar</a>
+</form>

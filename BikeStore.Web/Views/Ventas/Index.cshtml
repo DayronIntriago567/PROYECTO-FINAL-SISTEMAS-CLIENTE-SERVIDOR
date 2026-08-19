@@ -1,8 +1,44 @@
 @model List<BikeStore.Web.Models.Venta>
 @{
     ViewData["Title"] = "Ventas";
+    var clientes = ViewBag.Clientes as List<BikeStore.Web.Models.Cliente> ?? new();
 }
 <h1>Ventas</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (ViewBag.MensajeSinResultados != null)
+{
+    <div class="alert alert-info">@ViewBag.MensajeSinResultados</div>
+}
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">Registrar venta</a>
+</div>
+
+<form asp-action="PorCliente" method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-auto">
+        <label class="form-label">Consultar ventas de un cliente</label>
+        <select name="idCliente" class="form-select">
+            @foreach (var c in clientes)
+            {
+                <option value="@c.IdCliente" selected="@(ViewBag.ClienteSeleccionado != null && (int)ViewBag.ClienteSeleccionado == c.IdCliente)">@c.Nombres @c.Apellidos</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-secondary">Consultar</button>
+    </div>
+    @if (ViewBag.ClienteSeleccionado != null)
+    {
+        <div class="col-auto">
+            <a asp-action="Index" class="btn btn-outline-secondary">Ver todas</a>
+        </div>
+    }
+</form>
+
 @foreach (var v in Model)
 {
     <div style="border:1px solid #ccc; margin-bottom:15px; padding:10px;">
